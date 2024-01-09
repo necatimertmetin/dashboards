@@ -166,9 +166,10 @@
 
 .dashboard-card-container {
     border-radius: 50px;
-    background: #4D4E8E;
-    box-shadow: 3px 3px 6px #272848,
-        -3px -3px 6px #7374d4;
+    border: 5px solid #B9A5EF;
+    background-color: #28294b;
+    box-shadow: inset 4px 4px 6px #171729,
+        inset -4px -4px 6px #7374d4;
     border-radius: 10px;
     display: flex;
     flex-direction: row;
@@ -195,9 +196,10 @@
 
 .dashboard-card-content {
     border-radius: 50px;
-    border: 3px solid #4D4E8E;
-    box-shadow: inset 8px 8px 6px #22233d,
-        inset -8px -8px 6px #7374d4;
+    border: 3px solid #B9A5EF;
+    box-shadow: inset 10px 10px 6px #221d41,
+        inset -8px -8px 6px rgb(129, 130, 206);
+    background-color: #333;
     padding: 10px 20px;
     border-radius: 10px;
     height: calc(100% - 60px);
@@ -208,31 +210,45 @@
     justify-content: center;
     gap: 15px;
 }
-.dashboard-card-content-title{
+
+.dashboard-card-content-button {
     font-size: 22px;
     text-shadow: 2px 2px 2px #000;
     font-family: Poppins;
+    font-weight: 200;
+    border-radius: 10px;
+    background: #28294b;
+    box-shadow: inset -5px -5px 10px #05040a,
+        inset 5px 5px 10px #B9A5EF;
+    padding: 20px 40px;
+    user-select: none;
+    cursor: pointer;
+    transition: .2s ease;
 }
-.dashboard-card-content-data{
+.dashboard-card-content-button:active{
+        transform: scale(98%);
+}
+.dashboard-card-content-data {
     font-size: 28px;
     text-shadow: 3px 3px 2px #000;
     font-family: Poppins;
+    font-weight: 500;
 }
 
 @keyframes hover {
     0% {
         transform: translateY(-20px);
-        filter: drop-shadow(0px 40px 6px #252525ff);
+        filter: drop-shadow(0px 40px 6px #000000a0);
     }
 
     50% {
         transform: translateY(0);
-        filter: drop-shadow(0px 20px 6px #252525ff);
+        filter: drop-shadow(0px 20px 6px #000000a0);
     }
 
     100% {
         transform: translateY(-20px);
-        filter: drop-shadow(0px 40px 6px #252525ff);
+        filter: drop-shadow(0px 40px 6px #000000a0);
     }
 }
 
@@ -286,6 +302,7 @@
     font-family: Poppins;
     font-weight: 300;
     font-size: 22px;
+    text-shadow: 0px 0px 5px #fff;
 }
 
 .dashboard-mini-table-control-wrapper {
@@ -449,12 +466,15 @@
     border-radius: 100px;
     background: #181818;
     box-shadow: inset 2px 2px 3px #0a0a0a,
-        inset -2px -2px 3px #333;
+        inset -2px -2px 3px #333, 3px 3px 2px #0a0a0a,
+        -3px -3px 2px #262626;
+    border: 3px solid #202020;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
     width: 28px;
     height: 100%;
+    overflow: hidden;
 }
 
 .bar-fill {
@@ -462,6 +482,7 @@
     width: 100%;
     border-radius: 100px;
     background: linear-gradient(145deg, #eca529, #965f00);
+    box-shadow: 0px -1px 10px #c48822;
     transition: .5s ease;
     cursor: pointer;
 }

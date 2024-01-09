@@ -137,25 +137,23 @@ const Dashboard = () => {
 
                     <div className="dashboard-content">
                         <div className="dashboard-content-left">
+                        <div className="dashboard-card-container">
+                                <div className="dashboard-card-img-container">
+                                    <img className="dashboard-card-img" src={bagImg} alt="img" />
+                                </div>
+                                <div className="dashboard-card-content">
+                                    <div className="dashboard-card-content-button">
+                                        Premium
+                                    </div>
+                                </div>
+
+                            </div>
                             <div className="dashboard-radial-container">
                                 <TinyBarChart chartData={chartData} colors={colors} />
 
 
                             </div>
-                            <div className="dashboard-card-container">
-                                <div className="dashboard-card-img-container">
-                                    <img className="dashboard-card-img" src={bagImg} alt="img" />
-                                </div>
-                                <div className="dashboard-card-content">
-                                    <div className="dashboard-card-content-title">
-                                        YOU'RE DOING GREAT !
-                                    </div>
-                                    <div className="dashboard-card-content-data">
-                                        Keep Working
-                                    </div>
-                                </div>
-
-                            </div>
+                            
                         </div>
                         <div className="dashboard-content-right">
                             <div className="dashboard-mini-table-container">
