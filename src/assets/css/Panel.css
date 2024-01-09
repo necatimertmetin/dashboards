@@ -1,7 +1,7 @@
 .panel-container{
     background-color: #151513;
-    height: 100vh;
     display: flex;
     flex-direction: row;
     align-items: stretch;
+    height: 100vh;
 }
