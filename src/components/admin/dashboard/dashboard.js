@@ -11,6 +11,8 @@ import userIcon from '../../../assets/media/user.webp';
 import bagImg from '../../../assets/media/SVG/bag.svg';
 import DashboardTable from "../../table/dashboardTable";
 import ScrollContainer from 'react-indiana-drag-scroll'
+import TinyLineCards from "../cards/tinyLineCards";
+import LocationRow from "../../location/locationRow";
 const Dashboard = () => {
 
 
@@ -19,21 +21,49 @@ const Dashboard = () => {
     }
 
     // Function to generate an array with 20 items, each with a random value
-    function generateRandomDataArray() {
-        const dataArray = [];
-        for (let i = 1; i <= 10; i++) {
-            const value = getRandomValue(100, 800); // Adjust the range as needed
-            const title = value % 2 === 0 ? 'Total View' : 'Price'; // Set title conditionally
-            dataArray.push({ name: `Month ${i}`, value, title });
-        }
-        return dataArray;
-    }
+    const createStaticDataArrays = () => {
+        const dataArray1 = [
+            { name: 'Month 1', value: 100, title: 'Total View' },
+            { name: 'Month 2', value: 250 },
+            { name: 'Month 3', value: 150 },
+            { name: 'Month 4', value: 400 },
+            { name: 'Month 5', value: 100 }
+        ];
 
-    // Generate 4 arrays
-    const data1 = generateRandomDataArray();
-    const data2 = generateRandomDataArray();
-    const data3 = generateRandomDataArray();
-    const data4 = generateRandomDataArray();
+        const dataArray2 = [
+            { name: 'Month 1', value: 200, title: 'Total Earning' },
+            { name: 'Month 2', value: 300 },
+            { name: 'Month 3', value: 350 },
+            { name: 'Month 4', value: 450 },
+            { name: 'Month 5', value: 500 }
+        ];
+
+        const dataArray3 = [
+            { name: 'Month 1', value: 50, title: 'Total Spend' },
+            { name: 'Month 2', value: 200 },
+            { name: 'Month 3', value: 300 },
+            { name: 'Month 4', value: 100 },
+            { name: 'Month 5', value: 350 }
+        ];
+
+        const dataArray4 = [
+            { name: 'Month 1', value: 400, title: 'Total sale' },
+            { name: 'Month 2', value: 100 },
+            { name: 'Month 3', value: 150 },
+            { name: 'Month 4', value: 200 },
+            { name: 'Month 5', value: 250 }
+        ];
+
+
+        return [dataArray1, dataArray2, dataArray3, dataArray4];
+    };
+
+    // Atama işlemi
+    const [data1, data2, data3, data4] = createStaticDataArrays();
+
+
+
+
 
     const chartData = [
         { name: 'Sunday', value: 100 },
@@ -83,67 +113,87 @@ const Dashboard = () => {
         'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
     ];
 
-    const tableData = Array.from({ length: 5 }, (_, index) => ({
-        userIcon: userIcon,
-        title: nameArray[Math.floor(Math.random() * nameArray.length)],
-        email: emailArray[Math.floor(Math.random() * emailArray.length)],
-        classification: classificationArray[Math.floor(Math.random() * classificationArray.length)],
-        locationIcon: locationIcon,
-        location: locationArray[Math.floor(Math.random() * locationArray.length)],
-        description: descriptionArray[Math.floor(Math.random() * descriptionArray.length)],
-        status: getRandomStatus(),
-    }));
+    const tableData = [
+        {
+            userIcon: userIcon,
+            title: nameArray[0],
+            email: emailArray[0],
+            classification: classificationArray[0],
+            locationIcon: locationIcon,
+            location: locationArray[0],
+            description: descriptionArray[0],
+            status: 'Pending',
+        },
+        {
+            userIcon: userIcon,
+            title: nameArray[1],
+            email: emailArray[1],
+            classification: classificationArray[1],
+            locationIcon: locationIcon,
+            location: locationArray[1],
+            description: descriptionArray[1],
+            status: 'In Progress',
+        },
+        {
+            userIcon: userIcon,
+            title: nameArray[2],
+            email: emailArray[2],
+            classification: classificationArray[2],
+            locationIcon: locationIcon,
+            location: locationArray[2],
+            description: descriptionArray[2],
+            status: 'Completed',
+        },
+        {
+            userIcon: userIcon,
+            title: nameArray[3],
+            email: emailArray[3],
+            classification: classificationArray[3],
+            locationIcon: locationIcon,
+            location: locationArray[3],
+            description: descriptionArray[3],
+            status: 'Pending',
+        },
+        {
+            userIcon: userIcon,
+            title: nameArray[4],
+            email: emailArray[4],
+            classification: classificationArray[4],
+            locationIcon: locationIcon,
+            location: locationArray[4],
+            description: descriptionArray[4],
+            status: 'In Progress',
+        },
+    ];
+
+
+    const locationRowArray = [
+        { title: 'ADMIN' },
+        { title: 'Dashboard' },
+    ];
 
 
 
     return (
-        <div className="dashboard-container">
-            <Navbar />
+        <>
+
             <div className="dashboard-wrapper">
                 <div className="dashboard-content-container">
 
-                    <div className="dashboard-location-container">
-                        <div className="dashboard-location-item">
-                            DASHBOARD
-                        </div>
-                        <img src={rightArrow} alt=">" />
-                        <div className="dashboard-location-item">
-                            BEYOND.COM
-                        </div>
-                    </div>
+                    <LocationRow locationArray={locationRowArray} />
+                    
 
-                    <div className="dashboard-header-container">
-                        <div className="dashboard-content-card">
-                            <div class="dashboard-content-card2">
-                                <TinyLineChart data={data1} strokeColor={"#32CD32"} />
-                            </div>
-                        </div>
-                        <div className="dashboard-content-card">
-                            <div class="dashboard-content-card2">
-                                <TinyLineChart data={data2} strokeColor={"#7862f8"} />
-                            </div>
-                        </div>
-                        <div className="dashboard-content-card">
-                            <div class="dashboard-content-card2">
-                                <TinyLineChart data={data3} strokeColor={"#ff0055"} />
-                            </div>
-                        </div>
-                        <div className="dashboard-content-card">
-                            <div class="dashboard-content-card2">
-                                <TinyLineChart data={data4} strokeColor={"#FFD700"} />
-                            </div>
-                        </div>
-                    </div>
+                    <TinyLineCards data1={data1} data2={data2} data3={data3} data4={data4} />
 
                     <div className="dashboard-content">
                         <div className="dashboard-content-left">
-                        <div className="dashboard-card-container">
+                            <div className="dashboard-card-container">
                                 <div className="dashboard-card-img-container">
                                     <img className="dashboard-card-img" src={bagImg} alt="img" />
                                 </div>
                                 <div className="dashboard-card-content">
                                     <div className="dashboard-card-content-button">
-                                        Premium
+                                        View Products
                                     </div>
                                 </div>
 
@@ -153,7 +203,7 @@ const Dashboard = () => {
 
 
                             </div>
-                            
+
                         </div>
                         <div className="dashboard-content-right">
                             <div className="dashboard-mini-table-container">
@@ -182,7 +232,7 @@ const Dashboard = () => {
                 <div className="dashboard-widget-container">
                 </div>
             </div>
-        </div>
+        </>
     )
 
 }

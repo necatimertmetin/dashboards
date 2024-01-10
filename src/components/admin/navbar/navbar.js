@@ -6,10 +6,10 @@ import settingsIcon from '../../../assets/media/settings.png';
 import flagIcon from '../../../assets/media/flag.png';
 import checkedIcon from '../../../assets/media/checked.png';
 import widgetIcon from '../../../assets/media/widget.png';
-const Navbar = () => {
+const Navbar = ({items}) => {
     const [searchState, setSearchState] = useState(false);
     const [userState, setUserState] = useState(false);
-    const [navbarActiveItem, setNavbarActiveItem] = useState(false);
+    const [navbarActiveItem, setNavbarActiveItem] = useState(0);
     const handleSearchClick = () => {
         setSearchState(!searchState);
     }
@@ -19,11 +19,6 @@ const Navbar = () => {
     const handleNavbarItemClick = (index) => {
         setNavbarActiveItem(index)
     }
-    const items = [
-        'Dashboard',
-        'Advance Query',
-        'Events',
-    ];
 
     return (
         <nav className="dashboard-navbar">

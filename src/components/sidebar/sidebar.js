@@ -13,14 +13,10 @@ const Sidebar = ({ onItemSelect }) => {
         setActiveItem(index);
         onItemSelect(index);
     };
-    useEffect(() => {
-        // Call onItemSelect with the default value when Sidebar mounts
-        onItemSelect(activeItem);
-    }, [onItemSelect, activeItem]);
 
     const items = [
         { imgSrc: item1, title: 'DASHBOARD' },
-        { imgSrc: item2, title: 'TITLE' },
+        { imgSrc: item2, title: 'TEAM MANAGEMENT' },
         { imgSrc: item2, title: 'TITLE' },
         { imgSrc: item4, title: 'TITLE' },
     ];
@@ -32,7 +28,7 @@ const Sidebar = ({ onItemSelect }) => {
                 <div
                     key={index}
                     className={`sidebar-item-container ${activeItem === index ? 'sidebar-item-active' : ''}`}
-                    onClick={() => handleItemClick(index)}
+                    onClick={() => {handleItemClick(index); onItemSelect(index);}}
                 >
                     <img src={item.imgSrc} alt="V" className={`sidebar-item-img`} />
                     <div className="sidebar-item-title">{item.title}</div>

@@ -1,0 +1,119 @@
+.team-management-container {
+    padding: 20px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: stretch;
+
+}
+.member-list-container{
+    display: flex;
+    flex-direction: row;
+    gap: 50px;
+}
+.member-list {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background-color: #333;
+    padding: 15px 20px;
+    border-radius: 10px;
+    gap: 20px;
+    
+}
+
+.member-text-area {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+}
+
+.member-text-area * {
+    font-family: Poppins;
+}
+
+.member-title {
+    font-size: 16px;
+}
+
+.member-description {
+    font-size: 12px;
+    color: #ccc;
+}
+
+.member-list-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    height: 100%;
+    flex: 1;
+}
+
+.member {
+    height: 36px;
+    width: 36px;
+    margin-right: -15px;
+    border: 2px solid #888;
+    padding: 0;
+    border-radius: 100%;
+    transition: .2s ease;
+    cursor: pointer;
+}
+
+.member:hover {
+    transform: scale(155%);
+    border: 2px solid #ccc;
+}
+
+.member.online {
+    border: 2px solid rgb(1, 189, 1);
+}
+
+.member-list-create-team-button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #333;
+    margin-left: auto;
+    font-family: Poppins;
+    border-radius: 5px;
+    cursor: pointer;
+    gap: 10px;
+    border-radius: 5px;
+    background: #333;
+    box-shadow: 2px 2px 3px #0e0e0e,
+        -2px -2px 3px #535353;
+    transition: .1s linear;
+    user-select: none;
+}
+
+.member-list-create-team-button:hover {
+    background-color: #353535;
+    /* Change background color on hover */
+    box-shadow: 3px 3px 5px #0e0e0e, -3px -3px 5px #535353;
+    /* Change box shadow on hover */
+}
+
+.member-list-create-team-button:active {
+    background-color: #333;
+    /* Change background color on click/active state */
+    box-shadow: inset 1px 1px 1px #0e0e0e, inset -1px -1px 1px #535353;
+    box-shadow:  1px 1px 4px #cacaca,  -1px -1px 4px #ececec;
+    /* Add inset box shadow on click */
+    color: #ccc;
+    transform: scale(99%);
+}
+
+.member-list-button-img {
+    height: 28px;
+    width: 28px;
+    filter: invert(.8);
+    cursor: pointer;
+}
+.horizontal-separator{
+    border-bottom: 1px solid #888;
+    margin: 20px 0px;
+}

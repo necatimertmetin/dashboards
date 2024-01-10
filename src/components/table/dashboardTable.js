@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 const DashboardTable = ({ data }) => {
     const statusColors = {
@@ -6,6 +6,16 @@ const DashboardTable = ({ data }) => {
         Away: '#EA9C90',
         Offline: '#D0D3DA',
     };
+
+    useEffect(() => {
+        const rows = document.querySelectorAll('.dashboard-mini-table-data-row');
+
+        rows.forEach((row, index) => {
+            setTimeout(() => {
+                row.classList.add('animate');
+            }, index * 200); // 0.2 saniyelik (200ms) gecikme
+        });
+    }, [data]);
 
     return (
         <>
