@@ -190,6 +190,9 @@
     border-radius: 100px;
     padding: 12px;
 }
+.dashboard-location-item{
+    color: #fff;
+}
 
 .custom-tooltip {
     background-color: #333;
