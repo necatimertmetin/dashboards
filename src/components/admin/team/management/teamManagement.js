@@ -8,11 +8,17 @@ import options from '../../../../assets/media/more.png';
 import TeamManagementTaskHeaderItem from "./task/header/taskHeaderItem";
 import fileIcon from '../../../../assets/media/document.png';
 import commentIcon from '../../../../assets/media/comment.png';
+import TeamManagementTask from "./task/header/task";
+import TeamManagementTaskColumn from "./column/teamManagementTaskColumn";
+import teams from '../teams.json';
+import MemberList from "./member/memberList";
 const TeamManagement = () => {
-
+    const [activeIndex, setActiveIndex] = useState(null);
     const [allTeamsCollapsed, setAllTeamsCollapsed] = useState(false);
     const [teamListsCollapsed, setTeamListsCollapsed] = useState(false);
-    const [selectedTab, setSelectedTab] = useState("value-1"); // Initial selected tab
+    const [selectedTab, setSelectedTab] = useState(null); // Initial selected tab
+
+    const teamData = teams;
 
     const tabTitles = [
         'Frontend',
@@ -25,92 +31,130 @@ const TeamManagement = () => {
         { title: 'Dashboard' },
     ];
     const availableMemberCount = 3;
-    const generateMembers = (count) => {
-        const members = [];
 
-        for (let i = 0; i < count; i++) {
-            const status = i % 17 === 0 ? 'online' : 'away'; // Sırayla online ve away durumları
-            members.push({ img: userIcon, status });
+
+
+    const [selectedTeamIndex, setSelectedTeamIndex] = useState();
+    const [selectedTeamName, setSelectedTeamName] = useState();
+
+
+
+
+
+
+    const createTabs = (activeTeamIndex) => {
+        const activeTeamData = teams.teamManagement.teams[activeTeamIndex];
+
+        // Log the data to the console
+        console.log(activeTeamData);
+
+        if (!activeTeamData || typeof activeTeamData !== "object") {
+            return null; // or return <></> for an empty fragment
         }
 
-        return members;
-    };
-    const memberCount = 10;
-    const members = generateMembers(memberCount);
+        const teamKeys = Object.keys(activeTeamData);
+        console.log('TEAMKEYS ', teamKeys)
+        const tabId = `value-${activeTeamIndex + 1}`;
+        return teamKeys.map((teamKey, index) => {
+            // Skip rendering if the teamKey is "teamInfo"
+            console.log(index);
+            if (teamKey === "teamInfo") {
+                return null;
+            }
 
-    const onlineMembers = members.filter(member => member.status === 'online');
-    const awayMembers = members.filter(member => member.status === 'away');
-
-
-    const MemberList = ({ teamName, members, availableMemberCount }) => {
-        return (
-            <div className="member-list">
-                <div className="member-text-area">
-                    <div className="member-title">
-                        {teamName ? (teamName) : (members.length('members'))}
-                    </div>
-                    <div className="member-description">
-                        {availableMemberCount} available
-                    </div>
-                </div>
-                <div className="member-list-content">
-                    {members.online.map((member, index) => (
-                        <div key={index} className="team-management-member">
-                            <img
-                                className="member online"
-                                src={member.img}
-                                alt={`user ${index + 1}`}
-                            />
-                        </div>
-                    ))}
-
-                    {members.away.map((member, index) => (
-                        <div key={index} className="team-management-member">
-                            <img
-                                className="member away"
-                                src={member.img}
-                                alt={`user ${index + 1}`}
-                            />
-                        </div>
-                    ))}
-                </div>
-            </div>
-        )
-    }
-
-
-    const exampleMembers = {
-        online: [
-            { img: userIcon },
-            { img: userIcon },
-        ],
-        away: [
-            { img: userIcon },
-            { img: userIcon },
-        ],
-    };
-
-    const exampleAvailableMemberCount = 10;
-
-    const createTabs = () => {
-        return tabTitles.map((title, index) => {
-            const tabId = `value-${index + 1}`;
             return (
-                <label key={index} className={selectedTab === tabId ? 'selected' : ''}>
+                <label key={index} className={selectedTab === teamKey ? 'selected' : ''}>
                     <input
-                        value={tabId}
+                        value={index}
                         name="value-radio"
                         id={tabId}
                         type="radio"
-                        checked={selectedTab === tabId}
-                        onChange={() => setSelectedTab(tabId)}
+                        checked={selectedTab === teamKey}
+                        onChange={() => {
+                            tabClicked(teamKey);
+                        }}
                     />
-                    <span>{title}</span>
+                    <span>{teamKey.charAt(0).toUpperCase() + teamKey.slice(1)}</span>
                 </label>
             );
         });
+
     };
 
+    const tabClicked = (teamKey) => {
+        setSelectedTab(teamKey)
+        console.log("selectedTab = ", teamKey)
+        console.log("activeTeam = ", selectedTeamName)
+    }
+
+
+
+
+    const yourTaskList = Array.from({ length: 10 }, (_, index) => ({
+        id: index + 1,
+        taskTitle: `Task ${index + 1}`,
+        taskDescription: `Task ${index + 1} description`,
+        taggedUsers: [`User ${index + 1}`, `User ${index + 2}`],
+    }));
+
+    const taskList = Array.from({ length: 3 }, (_, index) => ({
+        id: index + 1,
+        taskTitle: `Task ${index + 1}`,
+        taskDescription: `Task ${index + 1} description`,
+        taggedUsers: [`User ${index + 1}`, `User ${index + 2}`],
+    }));
+
+    const columns = teamData.teamManagement.teams.map((team, teamIndex) => {
+        
+        if (teamIndex !== selectedTeamIndex) {
+            return null; // Skip if it's not the selected team
+        }
+        const selectedTabData = team[selectedTab];
+        if (!selectedTabData || !selectedTabData.columns) {
+            return null; // Skip if the selected tab or its columns are not available
+        }
+        
+        return selectedTabData.columns.map((column, columnIndex) => (
+            <TeamManagementTaskColumn
+                key={`${teamIndex}-column-${columnIndex}`}
+                columnTitle={column.columnTitle}
+                taskList={column.taskList}
+                userIcon={column.userIcon}
+                commentIcon={commentIcon}
+                fileIcon={fileIcon}
+                counter={column.counter}
+            />
+        ));
+    });
+    
+    console.log(teams.teamManagement.teams);
+
+    const calculateTotalMembers = (teams) => {
+        let totalMembers = 0;
+
+        Object.values(teams).forEach((team) => {
+            totalMembers += team.teamInfo.numMembers;
+        });
+
+        return totalMembers;
+    };
+
+    const flattenMembers = (teams) => {
+        let allMembers = [];
+
+        Object.values(teams.teamManagement.teams).forEach((team) => {
+            allMembers = allMembers.concat(team.teamInfo.members);
+        });
+
+        return allMembers;
+    };
+    // ...
+
+    // Toplam üye sayısını hesapla
+    const totalAvailableMembersCount = calculateTotalMembers(teams.teamManagement.teams);
+
+
+    // Console'a yazdırma
     return (
         <div className="team-management-container">
             <LocationRow locationArray={locationRowArray} />
@@ -119,36 +163,25 @@ const TeamManagement = () => {
                 <div className={`member-list  ${allTeamsCollapsed ? 'height-0' : ''}`} >
                     <div className="member-text-area">
                         <div className="member-title">
-                            {members.length} members
+                            {totalAvailableMembersCount} members
                         </div>
                         <div className="member-description">
                             {availableMemberCount} available
                         </div>
                     </div>
                     <div className="member-list-content">
-                        {onlineMembers.map((member, index) => (
-                            <div key={index} className="team-management-member">
+                        {flattenMembers(teams).map((member, index) => (
+                            <div key={index} className={`team-management-member ${member.status}`}>
                                 <img
-                                    className="member online"
-                                    src={member.img}
-                                    alt={`user ${index + 1}`}
-                                />
-                            </div>
-                        ))}
-
-                        {awayMembers.map((member, index) => (
-                            <div key={index} className="team-management-member">
-                                <img
-                                    className="member away"
-                                    src={member.img}
+                                    className="member"
+                                    src={member.photo || userIcon}
                                     alt={`user ${index + 1}`}
                                 />
                             </div>
                         ))}
                     </div>
                     <div className="member-list-create-team-button">
-                        <img className="member-list-button-img" src={createIcon} alt="asd" />
-
+                        <img className="member-list-button-img" src={createIcon} alt="Create Team" />
                         Create Team
                     </div>
                 </div>
@@ -160,12 +193,22 @@ const TeamManagement = () => {
                     </div>
                 </div>
                 <div className={`member-list-container ${teamListsCollapsed ? 'height-0' : ''}`}>
-                    <MemberList teamName={'Bytes'} members={exampleMembers} availableMemberCount={exampleAvailableMemberCount} />
-                    <MemberList teamName={'Alpha'} members={exampleMembers} availableMemberCount={exampleAvailableMemberCount} />
-                    <MemberList teamName={'Ctrl Alt Elite'} members={exampleMembers} availableMemberCount={exampleAvailableMemberCount} />
-                    <MemberList teamName={'Cool As Code'} members={exampleMembers} availableMemberCount={exampleAvailableMemberCount} />
-                    <MemberList teamName={'Pixie Chicks'} members={exampleMembers} availableMemberCount={exampleAvailableMemberCount} />
-                    <MemberList teamName={'Errors'} members={exampleMembers} availableMemberCount={exampleAvailableMemberCount} />
+                    {Object.values(teamData.teamManagement.teams).map((team, index) => (
+                        <MemberList
+                            key={`${team.teamInfo.teamName}-${index}`}
+                            teamName={team.teamInfo.teamName}
+                            members={team.teamInfo.members}
+                            availableMemberCount={team.teamInfo.numMembers}
+                            index={index}
+                            activeIndex={activeIndex}
+                            onTeamClick={(teamName, availableMemberCount, index) => {
+                                console.log(`Team Name: ${teamName}, Index: ${index}`);
+                                setActiveIndex(index);
+                                setSelectedTeamIndex(index);
+                                setSelectedTeamName(team.teamInfo.teamName);
+                            }}
+                        />
+                    ))}
 
                 </div>
 
@@ -176,747 +219,14 @@ const TeamManagement = () => {
                         <img className={`member-list-collapser-icon ${teamListsCollapsed ? 'rotate-180' : ''}`} src={arrow} alt="<" />
                     </div>
                 </div>
-
             </div>
+
 
             <div className="team-management-tab-container">
-                {createTabs()}
+                {createTabs(selectedTeamIndex, selectedTeamName)}
             </div>
+            {selectedTab === null ? ' ' : <div className="team-management-task-column-container">{columns}</div>}
 
-            <div className="team-management-task-column-container">
-                <div className="team-management-task-column">
-                    <div className="team-management-task-column-header">
-                        <div className="team-management-task-column-header-title">
-                            TO DO
-                        </div>
-                        <div className="team-management-task-column-header-counter">
-                            10
-                        </div>
-                        <div className="team-management-task-column-header-settings-container">
-                            <img className="team-management-task-column-header-settings-icon" src={options} alt="asd" />
-                        </div>
-                    </div>
-
-                    <div className="team-management-task-container">
-                        <div className="team-management-task">
-                            <div className="team-management-task-header">
-                                <TeamManagementTaskHeaderItem />
-                                <TeamManagementTaskHeaderItem />
-                            </div>
-                            <div className="team-management-task-title">
-                                Sort and Filter on Challenge Dashboard
-                            </div>
-                            <div className="team-management-task-description">
-                                As a brand admin, I would like to look at the challenge stats on a page so that I can see the overall results of my brand's challenge.
-
-
-
-
-                            </div>
-
-                            <div className="team-management-task-tag-container">
-                                <div className="user-tag">
-                                    <img className="user-tag-img" src={userIcon} alt="user" />
-                                    Jhon Doe
-                                </div>
-                                <div className="user-tag">
-                                    <img className="user-tag-img" src={userIcon} alt="user" />
-                                    Jhon Doe
-                                </div>
-
-                            </div>
-                            <div className="team-management-task-attachment-container">
-                                <div className="team-management-task-attachment">
-                                    <img className="team-management-task-attachment-icon" src={commentIcon} />
-                                    <div>
-                                        10
-                                    </div>
-                                </div>
-
-                                <div className="team-management-task-attachment">
-                                    <img className="team-management-task-attachment-icon" src={fileIcon} />
-                                    <div>
-                                        10
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="team-management-task">
-                            <div className="team-management-task-header">
-                                <TeamManagementTaskHeaderItem />
-                                <TeamManagementTaskHeaderItem />
-                            </div>
-                            <div className="team-management-task-title">
-                                Sort and Filter on Challenge Dashboard
-                            </div>
-                            <div className="team-management-task-description">
-                                As a brand admin, I would like to look at the challenge stats on a page so that I can see the overall results of my brand's challenge.
-
-
-
-
-                            </div>
-
-                            <div className="team-management-task-tag-container">
-                                <div className="user-tag">
-                                    <img className="user-tag-img" src={userIcon} alt="user" />
-                                    Jhon Doe
-                                </div>
-                                <div className="user-tag">
-                                    <img className="user-tag-img" src={userIcon} alt="user" />
-                                    Jhon Doe
-                                </div>
-
-                            </div>
-                            <div className="team-management-task-attachment-container">
-                                <div className="team-management-task-attachment">
-                                    <img className="team-management-task-attachment-icon" src={commentIcon} />
-                                    <div>
-                                        10
-                                    </div>
-                                </div>
-
-                                <div className="team-management-task-attachment">
-                                    <img className="team-management-task-attachment-icon" src={fileIcon} />
-                                    <div>
-                                        10
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="team-management-task">
-                            <div className="team-management-task-header">
-                                <TeamManagementTaskHeaderItem />
-                                <TeamManagementTaskHeaderItem />
-                            </div>
-                            <div className="team-management-task-title">
-                                Sort and Filter on Challenge Dashboard
-                            </div>
-                            <div className="team-management-task-description">
-                                As a brand admin, I would like to look at the challenge stats on a page so that I can see the overall results of my brand's challenge.
-
-
-
-
-                            </div>
-
-                            <div className="team-management-task-tag-container">
-                                <div className="user-tag">
-                                    <img className="user-tag-img" src={userIcon} alt="user" />
-                                    Jhon Doe
-                                </div>
-                                <div className="user-tag">
-                                    <img className="user-tag-img" src={userIcon} alt="user" />
-                                    Jhon Doe
-                                </div>
-
-                            </div>
-                            <div className="team-management-task-attachment-container">
-                                <div className="team-management-task-attachment">
-                                    <img className="team-management-task-attachment-icon" src={commentIcon} />
-                                    <div>
-                                        10
-                                    </div>
-                                </div>
-
-                                <div className="team-management-task-attachment">
-                                    <img className="team-management-task-attachment-icon" src={fileIcon} />
-                                    <div>
-                                        10
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div className="team-management-task-column">
-                    <div className="team-management-task-column-header">
-                        <div className="team-management-task-column-header-title">
-                            DEVELOPMENT
-                        </div>
-                        <div className="team-management-task-column-header-counter">
-                            10
-                        </div>
-                        <div className="team-management-task-column-header-settings-container">
-                            <img className="team-management-task-column-header-settings-icon" src={options} alt="asd" />
-                        </div>
-                    </div>
-
-                    <div className="team-management-task-container">
-                        <div className="team-management-task">
-                            <div className="team-management-task-header">
-                                <TeamManagementTaskHeaderItem />
-                                <TeamManagementTaskHeaderItem />
-                            </div>
-                            <div className="team-management-task-title">
-                                Sort and Filter on Challenge Dashboard
-                            </div>
-                            <div className="team-management-task-description">
-                                As a brand admin, I would like to look at the challenge stats on a page so that I can see the overall results of my brand's challenge.
-
-
-
-
-                            </div>
-
-                            <div className="team-management-task-tag-container">
-                                <div className="user-tag">
-                                    <img className="user-tag-img" src={userIcon} alt="user" />
-                                    Jhon Doe
-                                </div>
-                                <div className="user-tag">
-                                    <img className="user-tag-img" src={userIcon} alt="user" />
-                                    Jhon Doe
-                                </div>
-
-                            </div>
-                            <div className="team-management-task-attachment-container">
-                                <div className="team-management-task-attachment">
-                                    <img className="team-management-task-attachment-icon" src={commentIcon} />
-                                    <div>
-                                        10
-                                    </div>
-                                </div>
-
-                                <div className="team-management-task-attachment">
-                                    <img className="team-management-task-attachment-icon" src={fileIcon} />
-                                    <div>
-                                        10
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="team-management-task">
-                            <div className="team-management-task-header">
-                                <TeamManagementTaskHeaderItem />
-                                <TeamManagementTaskHeaderItem />
-                            </div>
-                            <div className="team-management-task-title">
-                                Sort and Filter on Challenge Dashboard
-                            </div>
-                            <div className="team-management-task-description">
-                                As a brand admin, I would like to look at the challenge stats on a page so that I can see the overall results of my brand's challenge.
-
-
-
-
-                            </div>
-
-                            <div className="team-management-task-tag-container">
-                                <div className="user-tag">
-                                    <img className="user-tag-img" src={userIcon} alt="user" />
-                                    Jhon Doe
-                                </div>
-                                <div className="user-tag">
-                                    <img className="user-tag-img" src={userIcon} alt="user" />
-                                    Jhon Doe
-                                </div>
-
-                            </div>
-                            <div className="team-management-task-attachment-container">
-                                <div className="team-management-task-attachment">
-                                    <img className="team-management-task-attachment-icon" src={commentIcon} />
-                                    <div>
-                                        10
-                                    </div>
-                                </div>
-
-                                <div className="team-management-task-attachment">
-                                    <img className="team-management-task-attachment-icon" src={fileIcon} />
-                                    <div>
-                                        10
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="team-management-task">
-                            <div className="team-management-task-header">
-                                <TeamManagementTaskHeaderItem />
-                                <TeamManagementTaskHeaderItem />
-                            </div>
-                            <div className="team-management-task-title">
-                                Sort and Filter on Challenge Dashboard
-                            </div>
-                            <div className="team-management-task-description">
-                                As a brand admin, I would like to look at the challenge stats on a page so that I can see the overall results of my brand's challenge.
-
-
-
-
-                            </div>
-
-                            <div className="team-management-task-tag-container">
-                                <div className="user-tag">
-                                    <img className="user-tag-img" src={userIcon} alt="user" />
-                                    Jhon Doe
-                                </div>
-                                <div className="user-tag">
-                                    <img className="user-tag-img" src={userIcon} alt="user" />
-                                    Jhon Doe
-                                </div>
-
-                            </div>
-                            <div className="team-management-task-attachment-container">
-                                <div className="team-management-task-attachment">
-                                    <img className="team-management-task-attachment-icon" src={commentIcon} />
-                                    <div>
-                                        10
-                                    </div>
-                                </div>
-
-                                <div className="team-management-task-attachment">
-                                    <img className="team-management-task-attachment-icon" src={fileIcon} />
-                                    <div>
-                                        10
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div className="team-management-task-column">
-                    <div className="team-management-task-column-header">
-                        <div className="team-management-task-column-header-title">
-                            TEST
-                        </div>
-                        <div className="team-management-task-column-header-counter">
-                            10
-                        </div>
-                        <div className="team-management-task-column-header-settings-container">
-                            <img className="team-management-task-column-header-settings-icon" src={options} alt="asd" />
-                        </div>
-                    </div>
-
-                    <div className="team-management-task-container">
-                        <div className="team-management-task">
-                            <div className="team-management-task-header">
-                                <TeamManagementTaskHeaderItem />
-                                <TeamManagementTaskHeaderItem />
-                            </div>
-                            <div className="team-management-task-title">
-                                Sort and Filter on Challenge Dashboard
-                            </div>
-                            <div className="team-management-task-description">
-                                As a brand admin, I would like to look at the challenge stats on a page so that I can see the overall results of my brand's challenge.
-
-
-
-
-                            </div>
-
-                            <div className="team-management-task-tag-container">
-                                <div className="user-tag">
-                                    <img className="user-tag-img" src={userIcon} alt="user" />
-                                    Jhon Doe
-                                </div>
-                                <div className="user-tag">
-                                    <img className="user-tag-img" src={userIcon} alt="user" />
-                                    Jhon Doe
-                                </div>
-
-                            </div>
-                            <div className="team-management-task-attachment-container">
-                                <div className="team-management-task-attachment">
-                                    <img className="team-management-task-attachment-icon" src={commentIcon} />
-                                    <div>
-                                        10
-                                    </div>
-                                </div>
-
-                                <div className="team-management-task-attachment">
-                                    <img className="team-management-task-attachment-icon" src={fileIcon} />
-                                    <div>
-                                        10
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="team-management-task">
-                            <div className="team-management-task-header">
-                                <TeamManagementTaskHeaderItem />
-                                <TeamManagementTaskHeaderItem />
-                            </div>
-                            <div className="team-management-task-title">
-                                Sort and Filter on Challenge Dashboard
-                            </div>
-                            <div className="team-management-task-description">
-                                As a brand admin, I would like to look at the challenge stats on a page so that I can see the overall results of my brand's challenge.
-
-
-
-
-                            </div>
-
-                            <div className="team-management-task-tag-container">
-                                <div className="user-tag">
-                                    <img className="user-tag-img" src={userIcon} alt="user" />
-                                    Jhon Doe
-                                </div>
-                                <div className="user-tag">
-                                    <img className="user-tag-img" src={userIcon} alt="user" />
-                                    Jhon Doe
-                                </div>
-
-                            </div>
-                            <div className="team-management-task-attachment-container">
-                                <div className="team-management-task-attachment">
-                                    <img className="team-management-task-attachment-icon" src={commentIcon} />
-                                    <div>
-                                        10
-                                    </div>
-                                </div>
-
-                                <div className="team-management-task-attachment">
-                                    <img className="team-management-task-attachment-icon" src={fileIcon} />
-                                    <div>
-                                        10
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="team-management-task">
-                            <div className="team-management-task-header">
-                                <TeamManagementTaskHeaderItem />
-                                <TeamManagementTaskHeaderItem />
-                            </div>
-                            <div className="team-management-task-title">
-                                Sort and Filter on Challenge Dashboard
-                            </div>
-                            <div className="team-management-task-description">
-                                As a brand admin, I would like to look at the challenge stats on a page so that I can see the overall results of my brand's challenge.
-
-
-
-
-                            </div>
-
-                            <div className="team-management-task-tag-container">
-                                <div className="user-tag">
-                                    <img className="user-tag-img" src={userIcon} alt="user" />
-                                    Jhon Doe
-                                </div>
-                                <div className="user-tag">
-                                    <img className="user-tag-img" src={userIcon} alt="user" />
-                                    Jhon Doe
-                                </div>
-
-                            </div>
-                            <div className="team-management-task-attachment-container">
-                                <div className="team-management-task-attachment">
-                                    <img className="team-management-task-attachment-icon" src={commentIcon} />
-                                    <div>
-                                        10
-                                    </div>
-                                </div>
-
-                                <div className="team-management-task-attachment">
-                                    <img className="team-management-task-attachment-icon" src={fileIcon} />
-                                    <div>
-                                        10
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div className="team-management-task-column">
-                    <div className="team-management-task-column-header">
-                        <div className="team-management-task-column-header-title">
-                            BLOCKED
-                        </div>
-                        <div className="team-management-task-column-header-counter">
-                            10
-                        </div>
-                        <div className="team-management-task-column-header-settings-container">
-                            <img className="team-management-task-column-header-settings-icon" src={options} alt="asd" />
-                        </div>
-                    </div>
-
-                    <div className="team-management-task-container">
-                        <div className="team-management-task">
-                            <div className="team-management-task-header">
-                                <TeamManagementTaskHeaderItem />
-                                <TeamManagementTaskHeaderItem />
-                            </div>
-                            <div className="team-management-task-title">
-                                Sort and Filter on Challenge Dashboard
-                            </div>
-                            <div className="team-management-task-description">
-                                As a brand admin, I would like to look at the challenge stats on a page so that I can see the overall results of my brand's challenge.
-
-
-
-
-                            </div>
-
-                            <div className="team-management-task-tag-container">
-                                <div className="user-tag">
-                                    <img className="user-tag-img" src={userIcon} alt="user" />
-                                    Jhon Doe
-                                </div>
-                                <div className="user-tag">
-                                    <img className="user-tag-img" src={userIcon} alt="user" />
-                                    Jhon Doe
-                                </div>
-
-                            </div>
-                            <div className="team-management-task-attachment-container">
-                                <div className="team-management-task-attachment">
-                                    <img className="team-management-task-attachment-icon" src={commentIcon} />
-                                    <div>
-                                        10
-                                    </div>
-                                </div>
-
-                                <div className="team-management-task-attachment">
-                                    <img className="team-management-task-attachment-icon" src={fileIcon} />
-                                    <div>
-                                        10
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="team-management-task">
-                            <div className="team-management-task-header">
-                                <TeamManagementTaskHeaderItem />
-                                <TeamManagementTaskHeaderItem />
-                            </div>
-                            <div className="team-management-task-title">
-                                Sort and Filter on Challenge Dashboard
-                            </div>
-                            <div className="team-management-task-description">
-                                As a brand admin, I would like to look at the challenge stats on a page so that I can see the overall results of my brand's challenge.
-
-
-
-
-                            </div>
-
-                            <div className="team-management-task-tag-container">
-                                <div className="user-tag">
-                                    <img className="user-tag-img" src={userIcon} alt="user" />
-                                    Jhon Doe
-                                </div>
-                                <div className="user-tag">
-                                    <img className="user-tag-img" src={userIcon} alt="user" />
-                                    Jhon Doe
-                                </div>
-
-                            </div>
-                            <div className="team-management-task-attachment-container">
-                                <div className="team-management-task-attachment">
-                                    <img className="team-management-task-attachment-icon" src={commentIcon} />
-                                    <div>
-                                        10
-                                    </div>
-                                </div>
-
-                                <div className="team-management-task-attachment">
-                                    <img className="team-management-task-attachment-icon" src={fileIcon} />
-                                    <div>
-                                        10
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="team-management-task">
-                            <div className="team-management-task-header">
-                                <TeamManagementTaskHeaderItem />
-                                <TeamManagementTaskHeaderItem />
-                            </div>
-                            <div className="team-management-task-title">
-                                Sort and Filter on Challenge Dashboard
-                            </div>
-                            <div className="team-management-task-description">
-                                As a brand admin, I would like to look at the challenge stats on a page so that I can see the overall results of my brand's challenge.
-
-
-
-
-                            </div>
-
-                            <div className="team-management-task-tag-container">
-                                <div className="user-tag">
-                                    <img className="user-tag-img" src={userIcon} alt="user" />
-                                    Jhon Doe
-                                </div>
-                                <div className="user-tag">
-                                    <img className="user-tag-img" src={userIcon} alt="user" />
-                                    Jhon Doe
-                                </div>
-
-                            </div>
-                            <div className="team-management-task-attachment-container">
-                                <div className="team-management-task-attachment">
-                                    <img className="team-management-task-attachment-icon" src={commentIcon} />
-                                    <div>
-                                        10
-                                    </div>
-                                </div>
-
-                                <div className="team-management-task-attachment">
-                                    <img className="team-management-task-attachment-icon" src={fileIcon} />
-                                    <div>
-                                        10
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div className="team-management-task-column">
-                    <div className="team-management-task-column-header">
-                        <div className="team-management-task-column-header-title">
-                            DONE
-                        </div>
-                        <div className="team-management-task-column-header-counter">
-                            10
-                        </div>
-                        <div className="team-management-task-column-header-settings-container">
-                            <img className="team-management-task-column-header-settings-icon" src={options} alt="asd" />
-                        </div>
-                    </div>
-
-                    <div className="team-management-task-container">
-                        <div className="team-management-task">
-                            <div className="team-management-task-header">
-                                <TeamManagementTaskHeaderItem />
-                                <TeamManagementTaskHeaderItem />
-                            </div>
-                            <div className="team-management-task-title">
-                                Sort and Filter on Challenge Dashboard
-                            </div>
-                            <div className="team-management-task-description">
-                                As a brand admin, I would like to look at the challenge stats on a page so that I can see the overall results of my brand's challenge.
-
-
-
-
-                            </div>
-
-                            <div className="team-management-task-tag-container">
-                                <div className="user-tag">
-                                    <img className="user-tag-img" src={userIcon} alt="user" />
-                                    Jhon Doe
-                                </div>
-                                <div className="user-tag">
-                                    <img className="user-tag-img" src={userIcon} alt="user" />
-                                    Jhon Doe
-                                </div>
-
-                            </div>
-                            <div className="team-management-task-attachment-container">
-                                <div className="team-management-task-attachment">
-                                    <img className="team-management-task-attachment-icon" src={commentIcon} />
-                                    <div>
-                                        10
-                                    </div>
-                                </div>
-
-                                <div className="team-management-task-attachment">
-                                    <img className="team-management-task-attachment-icon" src={fileIcon} />
-                                    <div>
-                                        10
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="team-management-task">
-                            <div className="team-management-task-header">
-                                <TeamManagementTaskHeaderItem />
-                                <TeamManagementTaskHeaderItem />
-                            </div>
-                            <div className="team-management-task-title">
-                                Sort and Filter on Challenge Dashboard
-                            </div>
-                            <div className="team-management-task-description">
-                                As a brand admin, I would like to look at the challenge stats on a page so that I can see the overall results of my brand's challenge.
-
-
-
-
-                            </div>
-
-                            <div className="team-management-task-tag-container">
-                                <div className="user-tag">
-                                    <img className="user-tag-img" src={userIcon} alt="user" />
-                                    Jhon Doe
-                                </div>
-                                <div className="user-tag">
-                                    <img className="user-tag-img" src={userIcon} alt="user" />
-                                    Jhon Doe
-                                </div>
-
-                            </div>
-                            <div className="team-management-task-attachment-container">
-                                <div className="team-management-task-attachment">
-                                    <img className="team-management-task-attachment-icon" src={commentIcon} />
-                                    <div>
-                                        10
-                                    </div>
-                                </div>
-
-                                <div className="team-management-task-attachment">
-                                    <img className="team-management-task-attachment-icon" src={fileIcon} />
-                                    <div>
-                                        10
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="team-management-task">
-                            <div className="team-management-task-header">
-                                <TeamManagementTaskHeaderItem />
-                                <TeamManagementTaskHeaderItem />
-                            </div>
-                            <div className="team-management-task-title">
-                                Sort and Filter on Challenge Dashboard
-                            </div>
-                            <div className="team-management-task-description">
-                                As a brand admin, I would like to look at the challenge stats on a page so that I can see the overall results of my brand's challenge.
-
-
-
-
-                            </div>
-
-                            <div className="team-management-task-tag-container">
-                                <div className="user-tag">
-                                    <img className="user-tag-img" src={userIcon} alt="user" />
-                                    Jhon Doe
-                                </div>
-                                <div className="user-tag">
-                                    <img className="user-tag-img" src={userIcon} alt="user" />
-                                    Jhon Doe
-                                </div>
-
-                            </div>
-                            <div className="team-management-task-attachment-container">
-                                <div className="team-management-task-attachment">
-                                    <img className="team-management-task-attachment-icon" src={commentIcon} />
-                                    <div>
-                                        10
-                                    </div>
-                                </div>
-
-                                <div className="team-management-task-attachment">
-                                    <img className="team-management-task-attachment-icon" src={fileIcon} />
-                                    <div>
-                                        10
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
         </div>
     )
 }

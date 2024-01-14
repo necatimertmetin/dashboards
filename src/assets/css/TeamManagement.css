@@ -28,7 +28,17 @@
     transition: .2s ease;
     cursor: pointer;
     color: #fff;
+}
 
+.member-list:hover {
+    background-color: #555;  /* Hover durumunda arka plan rengini değiştir */
+}
+
+.member-list.active {
+    background-color: #777;  /* Active durumunda arka plan rengini değiştir */
+}
+.active-member-list{
+    background-color: #777 !important;
 }
 
 .member-text-area {
@@ -181,6 +191,7 @@
     font-family: Poppins;
     font-size: 18px;
     font-weight: 300;
+    transition: .2s ease;
 }
 
 .team-management-tab-container {
@@ -198,6 +209,7 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    transition: .2s ease;
 }
 
 .team-management-tab-container label {
